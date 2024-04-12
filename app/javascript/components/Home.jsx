@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { PaginationControl } from 'react-bootstrap-pagination-control';
 
 export default () => {
   // List of fetched companies
@@ -9,6 +11,10 @@ export default () => {
   const [industry, setIndustry] = useState("");
   const [minEmployee, setMinEmployee] = useState("");
   const [minimumDealAmount, setMinimumDealAmount] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalRecordsCount, setTotalRecordsCount] = useState(0);
+
+  const perPage = 10;
 
   // Fetch companies from API
   useEffect(() => {
@@ -17,15 +23,20 @@ export default () => {
       .then((res) => {
         return res.json();
       })
-      .then((res) => setCompanies(res))
-  }, [])
+      .then((res) => {
+        setCompanies(res.records);
+        setTotalRecordsCount(res.total_records_count);
+      });
+  }, [companyName, industry, minEmployee, minimumDealAmount, page])
 
   const query = () => {
     const params = new URLSearchParams({
       company_name: companyName,
       industry_name: industry,
       min_employee_count: minEmployee,
-      min_deal_amount: minimumDealAmount
+      min_deal_amount: minimumDealAmount,
+      page: page,
+      per_page: perPage
     });
     return params.toString();
   }
@@ -78,6 +89,14 @@ export default () => {
               ))}
             </tbody>
           </table>
+          <PaginationControl
+            page={page}
+            total={totalRecordsCount}
+            limit={perPage}
+            changePage={(page) => {
+              setPage(page)
+            }}
+          />
         </div>
       </div>
     </div>
