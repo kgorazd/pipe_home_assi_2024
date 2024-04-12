@@ -1,8 +1,8 @@
-class Api::V1::CompaniesController < ApplicationController
+class Api::V1::CompaniesController < Api::BaseController
   def index
     companies = Company.order(created_at: :desc)
     companies = apply_filtering(companies)
-    render json: companies.includes(:deals).as_json(include: :deals)
+    render json: paginated(companies, { include: :deals } )
   end
 
   private
