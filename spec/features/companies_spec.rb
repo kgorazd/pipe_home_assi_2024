@@ -28,4 +28,15 @@ RSpec.describe "Companies page", type: :feature, js: true, driver: :selenium_chr
     expect(page).to have_content 'Companies'
     expect(page).to have_content Company.first.name
   end
+
+  it "filtering works" do
+    visit '/'
+    
+    within("#filters") do
+      fill_in 'Company Name', with: Company.last.name
+    end
+    
+    expect(page).to have_content Company.last.name
+    expect(page).to_not have_content Company.first.name
+  end
 end
