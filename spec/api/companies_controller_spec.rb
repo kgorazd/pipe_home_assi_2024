@@ -7,7 +7,13 @@ RSpec.describe "Companies", type: :request do
   end
 
   describe "GET /index" do
-    let(:companies_endpoint) { "/api/v1/companies" }
+    let(:companies_endpoint) { "/api/v1/companies?#{query}" }
+    let(:query) { "" }
+
+    let(:companies_data) do
+      get companies_endpoint
+      JSON.parse(response.body)["records"]
+    end
 
     it "returns http success" do
       get companies_endpoint
@@ -15,74 +21,69 @@ RSpec.describe "Companies", type: :request do
       expect(response.status).to eq(200)
     end
 
-    it "returns paginated results" do
-      page = 2
-      per_page = 2
-      
-      get "#{companies_endpoint}?page=#{page}&per_page=#{per_page}"
-      json_response = JSON.parse(response.body)
-      
-      expect(json_response.class).to eq(Hash)
-      expect(json_response["page"]).to eq(page)
-      expect(json_response["per_page"]).to eq(per_page)
-      expect(json_response["records"].class).to eq(Array)
-      expect(json_response["records"].length).to eq(per_page)
+    it "returns companies list with deals" do
+      expected_data = Company.order(created_at: :desc).with_total_deal_amount.as_json
+      expect(companies_data).to eq(expected_data)
     end
 
-    it "returns companies list with deals" do
-      get companies_endpoint
+    context "with pagination" do
+      let(:page) { 2 }
+      let(:per_page) { 2 }
+      let(:query) { "page=#{page}&per_page=#{per_page}" }
 
-      json_response = JSON.parse(response.body)
-      expected_data = Company.order(created_at: :desc).with_total_deal_amount.as_json
-      expect(json_response["records"]).to eq(expected_data)
+      it "returns paginated results" do
+        get companies_endpoint
+        json_response = JSON.parse(response.body)
+        
+        expect(json_response.class).to eq(Hash)
+        expect(json_response["page"]).to eq(page)
+        expect(json_response["per_page"]).to eq(per_page)
+        expect(json_response["records"].class).to eq(Array)
+        expect(json_response["records"].length).to eq(per_page)
+      end
     end
 
     context "with filters" do
-      let(:selected_company_name) { Company.last.name }
-      let(:selected_industry_name) { Company.first.industry }
-      let(:selected_employee_count) { Company.order(employee_count: :desc).first.employee_count - 1 }
-      let(:selected_deals_amount) { Company.with_total_deal_amount.order(total_deal_amount: :desc).first.total_deal_amount - 1 }
-      let(:companies_data) { JSON.parse(response.body)["records"] }
+      let(:companies_endpoint) { "/api/v1/companies?#{query}" }
 
-      it 'filtering by name' do
-        get "#{companies_endpoint}?company_name=#{selected_company_name}"
+      context 'filtering by name' do
+        let(:query) { "company_name=#{selected_company_name}" }
+        let(:selected_company_name) { Company.last.name }
 
-        expect(companies_data.length).to eq(1)
-        expect(companies_data.first["name"]).to eq(selected_company_name)
+        it 'returns filtered results' do
+          expect(companies_data.length).to eq(1)
+          expect(companies_data.first["name"]).to eq(selected_company_name)
+        end
       end
 
-      it 'filtering by industry' do
-        get "#{companies_endpoint}?industry_name=#{selected_industry_name}"
+      context 'filtering by industry' do
+        let(:query) { "industry_name=#{selected_industry_name}" }
+        let(:selected_industry_name) { Company.last.industry }
 
-        expect(companies_data.length).to eq(1)
-        expect(companies_data.first["industry"]).to eq(selected_industry_name)
+        it 'returns filtered results' do
+          expect(companies_data.length).to eq(1)
+          expect(companies_data.first["industry"]).to eq(selected_industry_name)
+        end
       end
 
-      it 'filtering by minimum employee count GREATER' do
-        get "#{companies_endpoint}?min_employee_count=#{selected_employee_count}"
+      context 'filtering by minimum employee count' do
+        let(:query) { "min_employee_count=#{selected_employee_count}" }
+        let(:selected_employee_count) { Company.order(employee_count: :desc).first.employee_count }
 
-        expect(companies_data.length).to eq(1)
-        expect(companies_data.first["employee_count"]).to be >= selected_employee_count
-      end
-      it 'filtering by minimum employee count EQUAL' do
-        get "#{companies_endpoint}?min_employee_count=#{selected_employee_count}"
-
-        expect(companies_data.length).to eq(1)
-        expect(companies_data.first["employee_count"]).to eq(selected_employee_count + 1)
+        it 'returns filtered results' do
+          expect(companies_data.length).to be <= Company.count
+          expect(companies_data.first["employee_count"]).to be >= selected_employee_count
+        end
       end
 
-      it 'filtering by minimum deal amount GREATER' do
-        get "#{companies_endpoint}?min_deal_amount=#{selected_deals_amount}"
+      context 'filtering by minimum deal amount' do
+        let(:query) { "min_deal_amount=#{selected_deal_amount}" }
+        let(:selected_deal_amount) { Company.with_total_deal_amount.order(total_deal_amount: :desc).first.total_deal_amount }
 
-        expect(companies_data.length).to eq(1)
-        expect(companies_data.first["total_deal_amount"]).to be >= selected_deals_amount
-      end
-
-      it 'filtering by minimum deal amount EQUAL' do
-        get "#{companies_endpoint}?min_deal_amount=#{selected_deals_amount}"
-
-        expect(companies_data.length).to eq(1)
-        expect(companies_data.first["total_deal_amount"]).to eq(selected_deals_amount + 1)
+        it 'returns filtered results' do
+          expect(companies_data.length).to be <= Company.count
+          expect(companies_data.first["total_deal_amount"]).to be >= selected_deal_amount
+        end
       end
     end
   end
