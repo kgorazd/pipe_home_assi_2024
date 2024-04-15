@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { PaginationControl } from 'react-bootstrap-pagination-control';
+import CompaniesTable from "./CompaniesTable";
 
 export default () => {
   // List of fetched companies
@@ -69,26 +70,8 @@ export default () => {
             </div>
           </div>
 
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Industry</th>
-                <th scope="col">Employee Count</th>
-                <th scope="col">Total Deal Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {companies.map((company) => (
-                <tr key={company.id}>
-                  <td>{company.name}</td>
-                  <td>{company.industry}</td>
-                  <td>{company.employee_count}</td>
-                  <td>{company.total_deal_amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          < CompaniesTable companies={companies} />
+
           <PaginationControl
             page={page}
             total={totalRecordsCount}
