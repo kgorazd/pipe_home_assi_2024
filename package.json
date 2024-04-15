@@ -16,7 +16,8 @@
     "react-bootstrap-pagination-control": "^1.0.5",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3",
-    "sass": "^1.70.0"
+    "sass": "^1.70.0",
+    "use-debounce": "^10.0.0"
   },
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",

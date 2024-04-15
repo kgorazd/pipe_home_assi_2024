@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { PaginationControl } from 'react-bootstrap-pagination-control';
 import CompaniesTable from "./CompaniesTable";
+import { useDebounce } from 'use-debounce';
 
 export default () => {
   // List of fetched companies
@@ -14,6 +15,13 @@ export default () => {
   const [minimumDealAmount, setMinimumDealAmount] = useState("");
   const [page, setPage] = useState(1);
   const [totalRecordsCount, setTotalRecordsCount] = useState(0);
+
+  const debouncedValues = [
+    useDebounce(companyName, 250)[0],
+    useDebounce(industry, 250)[0],
+    useDebounce(minEmployee, 250)[0],
+    useDebounce(minimumDealAmount, 250)[0]
+  ]
 
   const perPage = 10;
 
@@ -28,7 +36,7 @@ export default () => {
         setCompanies(res.records);
         setTotalRecordsCount(res.total_records_count);
       });
-  }, [companyName, industry, minEmployee, minimumDealAmount, page])
+  }, debouncedValues.concat([page]))
 
   const query = () => {
     const params = new URLSearchParams({
