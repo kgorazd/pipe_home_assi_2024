@@ -2,24 +2,8 @@ require 'rails_helper'
 
 RSpec.describe "Companies", type: :request do
   before do
-    5.times do |i|
-      Company.create(
-        name: Faker::Company.name,
-        industry: Faker::Company.industry,
-        employee_count: rand(10..1000)
-      )
-    end
-    
-    statuses = ["pending", "won", "lost"]
-    
-    15.times do |i|
-      Deal.create(
-        name: "Deal #{i}",
-        status: statuses.sample,
-        amount: rand(10..1000),
-        company_id: Company.order("RAND()").first.id
-      )
-    end
+    5.times { create(:company) }
+    15.times { create(:deal, company_id: Company.order("RAND()").first.id) }
   end
 
   describe "GET /index" do

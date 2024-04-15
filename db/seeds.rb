@@ -3,19 +3,17 @@
 #
 
 30.times do |i|
-  Company.create(
+  Company.create!(
     name: Faker::Company.name,
     industry: Faker::Company.industry,
     employee_count: rand(10..1000)
   )
 end
 
-statuses = ["pending", "won", "lost"]
-
 90.times do |i|
-  Deal.create(
+  Deal.create!(
     name: "Deal #{i}",
-    status: statuses.sample,
+    status: Deal::STATUSES.sample,
     amount: rand(10..1000),
     company_id: Company.order("RAND()").first.id
   )
