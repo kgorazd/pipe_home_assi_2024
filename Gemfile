@@ -58,10 +58,14 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
   gem "faker"
   gem "pry"
+end
+
+group :test do
   gem "rspec-rails", "~> 6.1.0"
   gem 'factory_bot_rails'
   gem 'capybara'
   gem 'selenium-webdriver'
+  gem 'shoulda-matchers', '~> 6.0'
 end
 
 group :development do
