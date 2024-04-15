@@ -29,4 +29,24 @@ class Api::BaseController < ApplicationController
       scope.count
     end
   end
+
+  def authorize
+    user = User.find_by(api_token: api_token)
+    return if user
+
+    if api_token.present?
+      render json: {
+        error: "Forbidden",
+      }, status: 403
+      return
+    end
+
+    render json: {
+      error: "Unauthorized",
+    }, status: 401
+  end
+
+  def api_token
+    params[:api_token]
+  end
 end

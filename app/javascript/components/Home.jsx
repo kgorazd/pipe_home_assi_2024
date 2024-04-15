@@ -30,12 +30,23 @@ export default () => {
     const url = "/api/v1/companies?" + query();
     fetch(url)
       .then((res) => {
-        return res.json();
+        if(res.ok) {
+          return res.json().then((res) => {
+            setCompanies(res.records);
+            setTotalRecordsCount(res.total_records_count);
+          })
+        } else {
+          return res.json().then((res) => {
+            console.error(res.error);
+            alert(res.error);
+          })
+        }
       })
-      .then((res) => {
-        setCompanies(res.records);
-        setTotalRecordsCount(res.total_records_count);
-      });
+      .catch(error => {
+        const msg = `Error: ${error.message}`
+        console.error(msg);
+        alert(msg);
+      })
   }, debouncedValues.concat([page]))
 
   const query = () => {
@@ -45,7 +56,8 @@ export default () => {
       min_employee_count: minEmployee,
       min_deal_amount: minimumDealAmount,
       page: page,
-      per_page: perPage
+      per_page: perPage,
+      api_token: sessionStorage.getItem("apiToken")
     });
     return params.toString();
   }

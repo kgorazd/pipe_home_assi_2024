@@ -1,14 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe "Companies", type: :request do
+  let(:user) { User.create(api_token: 'abc123') }
+
   before do
     5.times { create(:company) }
     15.times { create(:deal, company_id: Company.order("RAND()").first.id) }
   end
 
   describe "GET /index" do
-    let(:companies_endpoint) { "/api/v1/companies?#{query}" }
+    let(:companies_endpoint) { "/api/v1/companies?#{query}&#{auth}" }
     let(:query) { "" }
+    let(:auth) { "api_token=#{user.api_token}" }
 
     let(:companies_data) do
       get companies_endpoint
@@ -44,8 +47,6 @@ RSpec.describe "Companies", type: :request do
     end
 
     context "with filters" do
-      let(:companies_endpoint) { "/api/v1/companies?#{query}" }
-
       context 'filtering by name' do
         let(:query) { "company_name=#{selected_company_name}" }
         let(:selected_company_name) { Company.last.name }

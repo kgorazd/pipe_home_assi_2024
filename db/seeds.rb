@@ -18,3 +18,5 @@ end
     company_id: Company.order("RAND()").first.id
   )
 end
+
+User.create!(login: 'user', password: '123', api_token: 'abc123')
