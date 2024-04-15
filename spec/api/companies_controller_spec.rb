@@ -33,7 +33,7 @@ RSpec.describe "Companies", type: :request do
       get companies_endpoint
 
       json_response = JSON.parse(response.body)
-      expected_data = Company.order(created_at: :desc).as_json(include: :deals)
+      expected_data = Company.order(created_at: :desc).with_total_deal_amount.as_json
       expect(json_response["records"]).to eq(expected_data)
     end
 
@@ -41,7 +41,7 @@ RSpec.describe "Companies", type: :request do
       let(:selected_company_name) { Company.last.name }
       let(:selected_industry_name) { Company.first.industry }
       let(:selected_employee_count) { Company.order(employee_count: :desc).first.employee_count - 1 }
-      let(:selected_deals_amount) { Company.find_by(name: selected_company_name).deals.sum(:amount) - 1 }
+      let(:selected_deals_amount) { Company.with_total_deal_amount.order(total_deal_amount: :desc).first.total_deal_amount - 1 }
       let(:companies_data) { JSON.parse(response.body)["records"] }
 
       it 'filtering by name' do
@@ -69,6 +69,20 @@ RSpec.describe "Companies", type: :request do
 
         expect(companies_data.length).to eq(1)
         expect(companies_data.first["employee_count"]).to eq(selected_employee_count + 1)
+      end
+
+      it 'filtering by minimum deal amount GREATER' do
+        get "#{companies_endpoint}?min_deal_amount=#{selected_deals_amount}"
+
+        expect(companies_data.length).to eq(1)
+        expect(companies_data.first["total_deal_amount"]).to be >= selected_deals_amount
+      end
+
+      it 'filtering by minimum deal amount EQUAL' do
+        get "#{companies_endpoint}?min_deal_amount=#{selected_deals_amount}"
+
+        expect(companies_data.length).to eq(1)
+        expect(companies_data.first["total_deal_amount"]).to eq(selected_deals_amount + 1)
       end
     end
   end

@@ -84,7 +84,7 @@ export default () => {
                   <td>{company.name}</td>
                   <td>{company.industry}</td>
                   <td>{company.employee_count}</td>
-                  <td>{company.deals.reduce((sum, deal) => sum + deal.amount, 0)}</td>
+                  <td>{company.total_deal_amount}</td>
                 </tr>
               ))}
             </tbody>
