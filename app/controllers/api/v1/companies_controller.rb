@@ -1,12 +1,15 @@
 class Api::V1::CompaniesController < Api::BaseController
   def index
-    companies = Company.order(created_at: :desc)
-    companies = companies.with_total_deal_amount
-    companies = apply_filtering(companies)
-    render json: paginated(companies)
+    render json: paginated(companies_index_scope)
   end
 
   private
+
+  def companies_index_scope
+    companies = Company.order(created_at: :desc)
+    companies = companies.with_total_deal_amount
+    companies = apply_filtering(companies)
+  end
 
   def apply_filtering(companies)
     companies = companies.where('LOWER(companies.name) LIKE LOWER(?)', "%#{params[:company_name]}%") if params[:company_name].present?
