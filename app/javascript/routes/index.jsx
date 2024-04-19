@@ -7,7 +7,12 @@ import LogoutPage from "../components/LogoutPage";
 export default (
   <Router>
     <Routes>
-      <Route path="/" element={ sessionStorage.getItem("apiToken") == null ? <LoginPage/> : <Home /> } />
+      <Route
+        path="/"
+        element={
+          sessionStorage.getItem("apiToken") == null ? <LoginPage /> : <Home />
+        }
+      />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/logout" element={<LogoutPage />} />
     </Routes>

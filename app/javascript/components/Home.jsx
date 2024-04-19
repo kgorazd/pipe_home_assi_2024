@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { PaginationControl } from 'react-bootstrap-pagination-control';
+import "bootstrap/dist/css/bootstrap.min.css";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 import CompaniesTable from "./CompaniesTable";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
 
 export default () => {
   // List of fetched companies
@@ -20,34 +20,37 @@ export default () => {
     useDebounce(companyName, 250)[0],
     useDebounce(industry, 250)[0],
     useDebounce(minEmployee, 250)[0],
-    useDebounce(minimumDealAmount, 250)[0]
-  ]
+    useDebounce(minimumDealAmount, 250)[0],
+  ];
 
   const perPage = 10;
 
   // Fetch companies from API
-  useEffect(() => {
-    const url = "/api/v1/companies?" + query();
-    fetch(url)
-      .then((res) => {
-        if(res.ok) {
-          return res.json().then((res) => {
-            setCompanies(res.records);
-            updatePagination(res.total_records_count);
-          })
-        } else {
-          return res.json().then((res) => {
-            console.error(res.error);
-            alert(res.error);
-          })
-        }
-      })
-      .catch(error => {
-        const msg = `Error: ${error.message}`
-        console.error(msg);
-        alert(msg);
-      })
-  }, debouncedValues.concat([page]))
+  useEffect(
+    () => {
+      const url = "/api/v1/companies?" + query();
+      fetch(url)
+        .then((res) => {
+          if (res.ok) {
+            return res.json().then((res) => {
+              setCompanies(res.records);
+              updatePagination(res.total_records_count);
+            });
+          } else {
+            return res.json().then((res) => {
+              console.error(res.error);
+              alert(res.error);
+            });
+          }
+        })
+        .catch((error) => {
+          const msg = `Error: ${error.message}`;
+          console.error(msg);
+          alert(msg);
+        });
+    },
+    debouncedValues.concat([page]),
+  );
 
   const query = () => {
     const params = new URLSearchParams({
@@ -57,18 +60,17 @@ export default () => {
       min_deal_amount: minimumDealAmount,
       page: page,
       per_page: perPage,
-      api_token: sessionStorage.getItem("apiToken")
+      api_token: sessionStorage.getItem("apiToken"),
     });
     return params.toString();
-  }
+  };
 
   const updatePagination = (newTotalRecordsCount) => {
-    if (newTotalRecordsCount === totalRecordsCount)
-      return
+    if (newTotalRecordsCount === totalRecordsCount) return;
 
     setTotalRecordsCount(newTotalRecordsCount);
     setPage(1);
-  }
+  };
 
   return (
     <div className="vw-100 primary-color d-flex align-items-center justify-content-center">
@@ -76,40 +78,64 @@ export default () => {
         <div className="container secondary-color">
           <h1 className="display-4">Companies</h1>
 
-          <div id="filters" >
+          <div id="filters">
             <label htmlFor="company-name">Company Name</label>
             <div className="input-group mb-3">
-              <input type="text" className="form-control" id="company-name" value={companyName} onChange={e => setCompanyName(e.target.value)} />
+              <input
+                type="text"
+                className="form-control"
+                id="company-name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+              />
             </div>
 
             <label htmlFor="industry">Industry</label>
             <div className="input-group mb-3">
-              <input type="text" className="form-control" id="industry" value={industry} onChange={e => setIndustry(e.target.value)} />
+              <input
+                type="text"
+                className="form-control"
+                id="industry"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+              />
             </div>
 
             <label htmlFor="min-employee">Minimum Employee Count</label>
             <div className="input-group mb-3">
-              <input type="text" className="form-control" id="min-employee" value={minEmployee} onChange={e => setMinEmployee(e.target.value)} />
+              <input
+                type="text"
+                className="form-control"
+                id="min-employee"
+                value={minEmployee}
+                onChange={(e) => setMinEmployee(e.target.value)}
+              />
             </div>
 
             <label htmlFor="min-amount">Minimum Deal Amount</label>
             <div className="input-group mb-3">
-              <input type="text" className="form-control" id="min-amount" value={minimumDealAmount} onChange={e => setMinimumDealAmount(e.target.value)} />
+              <input
+                type="text"
+                className="form-control"
+                id="min-amount"
+                value={minimumDealAmount}
+                onChange={(e) => setMinimumDealAmount(e.target.value)}
+              />
             </div>
           </div>
 
-          < CompaniesTable companies={companies} />
+          <CompaniesTable companies={companies} />
 
           <PaginationControl
             page={page}
             total={totalRecordsCount}
             limit={perPage}
             changePage={(page) => {
-              setPage(page)
+              setPage(page);
             }}
           />
         </div>
       </div>
     </div>
-  )
+  );
 };

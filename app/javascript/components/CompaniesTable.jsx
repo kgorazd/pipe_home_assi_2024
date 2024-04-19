@@ -2,7 +2,6 @@ import React from "react";
 
 export default (props) => {
   return (
-    
     <table className="table">
       <thead>
         <tr>
@@ -23,5 +22,5 @@ export default (props) => {
         ))}
       </tbody>
     </table>
-  )
-}
+  );
+};

@@ -4,7 +4,7 @@ import App from "./App";
 
 document.addEventListener("DOMContentLoaded", () => {
   const root = createRoot(
-    document.body.appendChild(document.createElement("div"))
+    document.body.appendChild(document.createElement("div")),
   );
   root.render(<App />);
 });
