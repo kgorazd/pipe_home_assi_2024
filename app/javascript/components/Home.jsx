@@ -33,7 +33,7 @@ export default () => {
         if(res.ok) {
           return res.json().then((res) => {
             setCompanies(res.records);
-            setTotalRecordsCount(res.total_records_count);
+            updatePagination(res.total_records_count);
           })
         } else {
           return res.json().then((res) => {
@@ -60,6 +60,14 @@ export default () => {
       api_token: sessionStorage.getItem("apiToken")
     });
     return params.toString();
+  }
+
+  const updatePagination = (newTotalRecordsCount) => {
+    if (newTotalRecordsCount === totalRecordsCount)
+      return
+
+    setTotalRecordsCount(newTotalRecordsCount);
+    setPage(1);
   }
 
   return (

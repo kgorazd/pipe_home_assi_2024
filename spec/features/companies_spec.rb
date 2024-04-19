@@ -43,5 +43,17 @@ RSpec.describe "Companies page", type: :feature, js: true, driver: :selenium_chr
       expect(page).to_not have_content companies.first.name
       expect(page).to have_content companies.last.name
     end
+
+    it "filtering resets pagination" do
+      find('span', text: '›').click
+
+      within("#filters") do
+        fill_in 'Company Name', with: companies.last.name
+      end
+      
+      expect(page).to have_content companies.last.name
+      first_page_selector = find('span', text: '1').ancestor('li')
+      expect(first_page_selector[:class].split(' ')).to include('active')
+    end
   end
 end
