@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Company, type: :model do
   describe '#with_total_deal_amount' do
     before do
-      5.times { create(:company) }
-      15.times { create(:deal, company_id: Company.order("RAND()").first.id) }
+      create_list(:company, 5)
+      15.times { create(:deal, company_id: Company.order('RAND()').first.id) }
     end
 
     it 'returns valid total_deal_amount' do

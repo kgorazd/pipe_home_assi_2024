@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CollectionSerializer
   attr_reader :collection, :item_serializer
 

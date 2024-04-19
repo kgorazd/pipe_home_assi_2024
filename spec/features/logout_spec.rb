@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Logout", type: :feature, js: true, driver: :selenium_chrome_headless do
+RSpec.describe 'Logout', type: :feature, js: true, driver: :selenium_chrome_headless do
   let!(:company) { create(:company) }
 
   let(:user) { User.create!(login: 'user', password: '123', api_token: 'abc123') }
 
-  it "logout page redirects to login page" do
+  it 'logout page redirects to login page' do
     visit '/logout'
 
     expect(page).to have_current_path('/login')
@@ -14,17 +16,17 @@ RSpec.describe "Logout", type: :feature, js: true, driver: :selenium_chrome_head
     expect(page).to have_content 'Password'
   end
 
-  context "user logged in" do
+  context 'user logged in' do
     before do
       visit '/login'
-      within("#form") do
+      within('#form') do
         fill_in 'Username', with: user.login
         fill_in 'Password', with: user.password
         click_button('Submit')
       end
     end
 
-    it "logout works" do
+    it 'logout works' do
       expect(page).to have_content 'Companies'
       expect(page).to have_content company.name
 

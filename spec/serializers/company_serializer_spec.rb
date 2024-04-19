@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe CompanySerializer do
   let(:company) { create(:company) }
 
-  it "serializes the company" do
+  it 'serializes the company' do
     actual = CompanySerializer.new(company).call
     expected = {
       name: company.name,

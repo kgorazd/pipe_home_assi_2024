@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CompanySerializer
   attr_reader :company
 
@@ -10,7 +12,7 @@ class CompanySerializer
       name: company.name,
       industry: company.industry,
       employee_count: company.employee_count,
-      total_deal_amount: total_deal_amount
+      total_deal_amount:
     }
   end
 

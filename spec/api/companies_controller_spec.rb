@@ -1,36 +1,38 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-RSpec.describe "Companies", type: :request do
+RSpec.describe 'Companies', type: :request do
   let(:user) { User.create(api_token: 'abc123') }
 
   before do
-    5.times { create(:company) }
-    15.times { create(:deal, company_id: Company.order("RAND()").first.id) }
+    create_list(:company, 5)
+    15.times { create(:deal, company_id: Company.order('RAND()').first.id) }
   end
 
-  describe "GET /index" do
+  describe 'GET /index' do
     let(:companies_endpoint) { "/api/v1/companies?#{query}&#{auth}" }
-    let(:query) { "" }
+    let(:query) { '' }
     let(:auth) { "api_token=#{user.api_token}" }
 
     let(:companies_data) do
       get companies_endpoint
-      JSON.parse(response.body)["records"]
+      JSON.parse(response.body)['records']
     end
 
-    it "returns http success" do
+    it 'returns http success' do
       get companies_endpoint
 
       expect(response.status).to eq(200)
     end
 
-    it "returns companies list" do
+    it 'returns companies list' do
       scope = Company.order(created_at: :desc).with_total_deal_amount
       expected_data = CollectionSerializer.new(scope, CompanySerializer).call
       expect(companies_data).to eq(expected_data.as_json)
     end
 
-    it "returns correct company json" do
+    it 'returns correct company json' do
       actual = companies_data.first
       company = Company.order(created_at: :desc).first
       expected = CompanySerializer.new(company).call.as_json
@@ -45,31 +47,31 @@ RSpec.describe "Companies", type: :request do
       expect(actual).to eq(expected_data)
     end
 
-    context "with pagination" do
+    context 'with pagination' do
       let(:page) { 2 }
       let(:per_page) { 2 }
       let(:query) { "page=#{page}&per_page=#{per_page}" }
 
-      it "returns paginated results" do
+      it 'returns paginated results' do
         get companies_endpoint
         json_response = JSON.parse(response.body)
-        
+
         expect(json_response.class).to eq(Hash)
-        expect(json_response["page"]).to eq(page)
-        expect(json_response["per_page"]).to eq(per_page)
-        expect(json_response["records"].class).to eq(Array)
-        expect(json_response["records"].length).to eq(per_page)
+        expect(json_response['page']).to eq(page)
+        expect(json_response['per_page']).to eq(per_page)
+        expect(json_response['records'].class).to eq(Array)
+        expect(json_response['records'].length).to eq(per_page)
       end
     end
 
-    context "with filters" do
+    context 'with filters' do
       context 'filtering by name' do
         let(:query) { "company_name=#{selected_company_name}" }
         let(:selected_company_name) { Company.last.name }
 
         it 'returns filtered results' do
           expect(companies_data.length).to eq(1)
-          expect(companies_data.first["name"]).to eq(selected_company_name)
+          expect(companies_data.first['name']).to eq(selected_company_name)
         end
       end
 
@@ -79,7 +81,7 @@ RSpec.describe "Companies", type: :request do
 
         it 'returns filtered results' do
           expect(companies_data.length).to eq(1)
-          expect(companies_data.first["industry"]).to eq(selected_industry_name)
+          expect(companies_data.first['industry']).to eq(selected_industry_name)
         end
       end
 
@@ -89,17 +91,19 @@ RSpec.describe "Companies", type: :request do
 
         it 'returns filtered results' do
           expect(companies_data.length).to be <= Company.count
-          expect(companies_data.first["employee_count"]).to be >= selected_employee_count
+          expect(companies_data.first['employee_count']).to be >= selected_employee_count
         end
       end
 
       context 'filtering by minimum deal amount' do
         let(:query) { "min_deal_amount=#{selected_deal_amount}" }
-        let(:selected_deal_amount) { Company.with_total_deal_amount.order(total_deal_amount: :desc).first.total_deal_amount }
+        let(:selected_deal_amount) do
+          Company.with_total_deal_amount.order(total_deal_amount: :desc).first.total_deal_amount
+        end
 
         it 'returns filtered results' do
           expect(companies_data.length).to be <= Company.count
-          expect(companies_data.first["total_deal_amount"]).to be >= selected_deal_amount
+          expect(companies_data.first['total_deal_amount']).to be >= selected_deal_amount
         end
       end
     end
