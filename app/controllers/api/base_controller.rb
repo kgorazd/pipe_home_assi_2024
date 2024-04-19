@@ -13,12 +13,13 @@ class Api::BaseController < ApplicationController
     scope.page(page).per(per_page)
   end
 
-  def paginated(scope, as_json_options = {})
+  def paginated(scope, serializer)
+    paginated_scope = apply_pagination(scope)
     {
       page: page,
       per_page: per_page,
       total_records_count: total_records_count(scope),
-      records: apply_pagination(scope).as_json(as_json_options)
+      records: CollectionSerializer.new(paginated_scope, serializer).call
     }
   end
 

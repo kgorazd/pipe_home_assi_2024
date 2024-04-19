@@ -22,4 +22,18 @@ RSpec.describe Company, type: :model do
       expect(result.total_deal_amount).to eq(0)
     end
   end
+
+  describe '#calculate_total_deal_amount' do
+    let(:company) { create(:company) }
+    let(:result) { company.calculate_total_deal_amount }
+
+    it 'returns 0 as total when no deals available' do
+      expect(result).to eq(0)
+    end
+
+    it 'returns valid total_deal_amount' do
+      expected_total_deal_amount = company.deals.sum(:amount)
+      expect(result).to eq(expected_total_deal_amount)
+    end
+  end
 end

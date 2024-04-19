@@ -24,9 +24,25 @@ RSpec.describe "Companies", type: :request do
       expect(response.status).to eq(200)
     end
 
-    it "returns companies list with deals" do
-      expected_data = Company.order(created_at: :desc).with_total_deal_amount.as_json
-      expect(companies_data).to eq(expected_data)
+    it "returns companies list" do
+      scope = Company.order(created_at: :desc).with_total_deal_amount
+      expected_data = CollectionSerializer.new(scope, CompanySerializer).call
+      expect(companies_data).to eq(expected_data.as_json)
+    end
+
+    it "returns correct company json" do
+      actual = companies_data.first
+      company = Company.order(created_at: :desc).first
+      expected = CompanySerializer.new(company).call.as_json
+      expect(actual).to eq(expected)
+
+      expected_data = {
+        name: company.name,
+        industry: company.industry,
+        employee_count: company.employee_count,
+        total_deal_amount: company.calculate_total_deal_amount
+      }.as_json
+      expect(actual).to eq(expected_data)
     end
 
     context "with pagination" do

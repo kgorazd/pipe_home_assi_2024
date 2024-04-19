@@ -2,7 +2,7 @@ class Api::V1::CompaniesController < Api::BaseController
   before_action :authorize
 
   def index
-    render json: paginated(companies_index_scope)
+    render json: paginated(companies_index_scope, CompanySerializer)
   end
 
   private
